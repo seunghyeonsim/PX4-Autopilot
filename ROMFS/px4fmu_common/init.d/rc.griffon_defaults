@@ -1,0 +1,81 @@
+#!/bin/sh
+#
+# GRIFFON — properties that the simulation and the real vehicle share.
+#
+# Sourced by BOTH airframe files:
+#   init.d-posix/airframes/4007_gz_griffon   (SITL)
+#   init.d/airframes/4007_griffon            (Pixhawk)
+#
+# What belongs here: quantities that were MEASURED off the vehicle - geometry,
+# mass, inertia, propeller coefficients. If the number comes from a ruler or a
+# scale, it is the same number in both places and it lives here.
+#
+# What does NOT belong here: quantities that were TUNED - hover throttle, PID
+# gains, filter cut-offs. Those depend on the actual motors, props and ESCs,
+# so simulation and hardware legitimately differ. Keep them in the airframe
+# file that needs them.
+#
+# The point of this file is that measuring the vehicle once updates one line,
+# and both builds pick it up. Copying geometry into two airframe files means
+# a later correction can land in only one of them, and nothing errors out -
+# SITL keeps flying while the real vehicle is wrong.
+#
+# WARNING: the numbers below are still the placeholder values carried over
+# from the old CAROLLINE airframe. Nothing here has been measured on GRIFFON.
+# See Sim_Real_Config.html in the GRIFFON repo for the checklist.
+#
+# Geometry source of truth:
+#   Griffon_ws/src/griffon_description/urdf/griffon_params.xacro
+#     arm     = 0.1125 m
+#     rotor_z = 0.005 m   (FLU, above centre)  ->  -0.005 in FRD
+#
+# Rotor numbering follows the GRIFFON airframe drawing, not the PX4 default:
+#
+#   motor 1  right  (body -y in ROS/FLU, +y here in FRD)  CCW
+#   motor 2  left                                          CCW
+#   motor 3  FRONT                                         CW
+#   motor 4  rear                                          CW
+#
+# Positions are in the PX4 body frame (FRD: x forward, y right, z down). The
+# GRIFFON URDF is REP-103 (FLU), so y and z are negated relative to the xacro.
+
+# ---------------------------------------------------------------- allocation
+param set-default CA_AIRFRAME 0
+param set-default CA_ROTOR_COUNT 4
+
+# motor 1 — right, CCW  (KM > 0 is CCW in PX4)
+param set-default CA_ROTOR0_PX 0.0
+param set-default CA_ROTOR0_PY 0.1125
+param set-default CA_ROTOR0_PZ -0.005
+param set-default CA_ROTOR0_KM 0.05
+
+# motor 2 — left, CCW
+param set-default CA_ROTOR1_PX 0.0
+param set-default CA_ROTOR1_PY -0.1125
+param set-default CA_ROTOR1_PZ -0.005
+param set-default CA_ROTOR1_KM 0.05
+
+# motor 3 — front, CW
+param set-default CA_ROTOR2_PX 0.1125
+param set-default CA_ROTOR2_PY 0.0
+param set-default CA_ROTOR2_PZ -0.005
+param set-default CA_ROTOR2_KM -0.05
+
+# motor 4 — rear, CW
+param set-default CA_ROTOR3_PX -0.1125
+param set-default CA_ROTOR3_PY 0.0
+param set-default CA_ROTOR3_PZ -0.005
+param set-default CA_ROTOR3_KM -0.05
+
+# All four motors are bidirectional (bits 0-3). Rolling drives the cage with
+# reverse thrust, which a stock unidirectional mixer cannot produce. This is a
+# property of the ESCs, so it is the same claim in both builds.
+param set-default CA_R_REV 15
+
+# ------------------------------------------------------------------ estimator
+# Height reference. The PX4 default is GPS (1), which suits an outdoor vehicle.
+# GRIFFON flies indoors inside a cage, where there is no GPS fix at all, so the
+# barometer is the source that will actually be there. Once the LIO chain feeds
+# EKF2, vision (3) becomes the right reference.
+#   0 = barometer, 1 = GPS, 2 = range sensor, 3 = vision
+param set-default EKF2_HGT_REF 0

@@ -8,27 +8,13 @@
 # rolls on the ground; rolling needs reverse thrust, hence the reversible
 # motors (CA_R_REV).
 #
-# Rotor numbering follows the GRIFFON airframe drawing, not the PX4 default:
-#
-#   motor 1  right  (body -y in ROS/FLU, +y here in FRD)  CCW
-#   motor 2  left                                          CCW
-#   motor 3  FRONT                                         CW
-#   motor 4  rear                                          CW
-#
-# Positions below are in the PX4 body frame (FRD: x forward, y right, z down).
-# The GRIFFON URDF is REP-103 (FLU), so y and z are negated relative to
-# griffon_params.xacro.
-#
-# Geometry source: Griffon_ws/src/griffon_description/urdf/griffon_params.xacro
-#   arm      = 0.1125 m
-#   rotor_z  = 0.005 m   (FLU, above centre)  ->  -0.005 in FRD
-#
-# WARNING: mass, inertia and the moment coefficient are still the placeholder
-# values carried over from the old CAROLLINE airframe. Do not trust quantitative
-# results until they are measured on GRIFFON.
+# Everything the real vehicle shares with this one - geometry, rotor layout,
+# propeller coefficients, height reference - lives in rc.griffon_defaults and
+# is sourced below. Only what is genuinely simulation-specific stays here.
 #
 
 . ${R}etc/init.d/rc.mc_defaults
+. ${R}etc/init.d/rc.griffon_defaults
 
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
@@ -40,39 +26,8 @@ param set-default SENS_EN_GPSSIM 1
 param set-default SENS_EN_BAROSIM 0
 param set-default SENS_EN_MAGSIM 1
 
-# ---------------------------------------------------------------- allocation
-param set-default CA_AIRFRAME 0
-param set-default CA_ROTOR_COUNT 4
-
-# motor 1 — right, CCW  (KM > 0 is CCW in PX4)
-param set-default CA_ROTOR0_PX 0.0
-param set-default CA_ROTOR0_PY 0.1125
-param set-default CA_ROTOR0_PZ -0.005
-param set-default CA_ROTOR0_KM 0.05
-
-# motor 2 — left, CCW
-param set-default CA_ROTOR1_PX 0.0
-param set-default CA_ROTOR1_PY -0.1125
-param set-default CA_ROTOR1_PZ -0.005
-param set-default CA_ROTOR1_KM 0.05
-
-# motor 3 — front, CW
-param set-default CA_ROTOR2_PX 0.1125
-param set-default CA_ROTOR2_PY 0.0
-param set-default CA_ROTOR2_PZ -0.005
-param set-default CA_ROTOR2_KM -0.05
-
-# motor 4 — rear, CW
-param set-default CA_ROTOR3_PX -0.1125
-param set-default CA_ROTOR3_PY 0.0
-param set-default CA_ROTOR3_PZ -0.005
-param set-default CA_ROTOR3_KM -0.05
-
-# All four motors are bidirectional (bits 0-3). Rolling drives the cage with
-# reverse thrust, which a stock unidirectional mixer cannot produce.
-param set-default CA_R_REV 15
-
 # ------------------------------------------------------------ gz output map
+# The real airframe replaces this whole block with PWM_MAIN_* or DShot.
 param set-default SIM_GZ_EC_FUNC1 101
 param set-default SIM_GZ_EC_FUNC2 102
 param set-default SIM_GZ_EC_FUNC3 103
@@ -97,19 +52,8 @@ param set-default SIM_GZ_EC_DIS2 575
 param set-default SIM_GZ_EC_DIS3 575
 param set-default SIM_GZ_EC_DIS4 575
 
+# Hover throttle is TUNED, not measured - it follows from what the motors,
+# props and ESCs actually produce. Here it matches the simulated max_thrust of
+# 4.5 N per rotor in GriffonThrustSystem. The real vehicle will have its own
+# value, so this deliberately does NOT go in rc.griffon_defaults.
 param set-default MPC_THR_HOVER 0.60
-
-# Height reference. The PX4 default is GPS (1), which suits an outdoor
-# vehicle. GRIFFON flies indoors inside a cage, where there is no GPS fix at
-# all, so the barometer is the source that will actually be there.
-#
-# Worth knowing: SITL injects sigma = 0.5 m of noise on GPS altitude
-# (SensorGpsSim.cpp: alt = gpos.alt + generate_wgn() * 0.5) and reports epv
-# 1.78 m, so the simulated GPS is a poor height anchor as well.
-#
-# This does NOT fix the height error seen after touchdown - that reproduces
-# with either reference. See the GRIFFON dev doc for the measurements.
-#
-# Once the LIO chain feeds EKF2, vision (3) becomes the right reference.
-#   0 = barometer, 1 = GPS, 2 = range sensor, 3 = vision
-param set-default EKF2_HGT_REF 0
