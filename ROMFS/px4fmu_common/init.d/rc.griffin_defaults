@@ -90,4 +90,12 @@ param set-default EKF2_GPS_CTRL 0
 # barometer is the source that will actually be there. Once the LIO chain feeds
 # EKF2, vision (3) becomes the right reference.
 #   0 = barometer, 1 = GPS, 2 = range sensor, 3 = vision
-param set-default EKF2_HGT_REF 0
+#
+# Vision, not the barometer. Whichever source is NOT the reference gets a bias
+# estimated against the one that is, and with EKF2_EVP_NOISE at 0.1 m against
+# EKF2_BARO_NOISE at 3.5 m the filter follows vision anyway - so making the
+# barometer the reference just means vision is fused through a bias that the
+# estimator has to unwind. Measured that going wrong: LIO reported 2.50 m of
+# climb and the barometer agreed at 2.50, while the EV aid source came out at
+# 0.75 and the state followed it, leaving the altitude 1.9 m low.
+param set-default EKF2_HGT_REF 3
