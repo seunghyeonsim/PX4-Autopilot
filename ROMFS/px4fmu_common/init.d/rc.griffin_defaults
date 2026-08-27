@@ -73,6 +73,18 @@ param set-default CA_ROTOR3_KM -0.05
 param set-default CA_R_REV 15
 
 # ------------------------------------------------------------------ estimator
+# GNSS aiding off. GRIFFIN flies indoors inside a cage, where there is no fix to
+# be had, so the estimator runs on external vision (the LIO chain) and the
+# barometer. Leaving GNSS enabled would not break anything on hardware - the
+# quality checks reject a bad fix on their own - but it hides whether LIO is
+# actually carrying the estimate, because SITL's simulated GNSS never degrades:
+# it reports 10 satellites and eph 0.9 regardless of where the vehicle is, since
+# it is ground truth plus white noise rather than a modelled receiver.
+#
+# Turn this back on when moving outdoors. Bits: 0 lon/lat, 1 alt, 2 3D velocity,
+# 3 dual-antenna heading. The stock value is 7.
+param set-default EKF2_GPS_CTRL 0
+
 # Height reference. The PX4 default is GPS (1), which suits an outdoor vehicle.
 # GRIFFIN flies indoors inside a cage, where there is no GPS fix at all, so the
 # barometer is the source that will actually be there. Once the LIO chain feeds
