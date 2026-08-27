@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# @name GRIFFON caged rolling drone (Gazebo)
+# @name GRIFFIN caged rolling drone (Gazebo)
 #
 # @type Quadrotor +
 #
@@ -9,16 +9,16 @@
 # motors (CA_R_REV).
 #
 # Everything the real vehicle shares with this one - geometry, rotor layout,
-# propeller coefficients, height reference - lives in rc.griffon_defaults and
+# propeller coefficients, height reference - lives in rc.griffin_defaults and
 # is sourced below. Only what is genuinely simulation-specific stays here.
 #
 
 . ${R}etc/init.d/rc.mc_defaults
-. ${R}etc/init.d/rc.griffon_defaults
+. ${R}etc/init.d/rc.griffin_defaults
 
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
-PX4_SIM_MODEL=${PX4_SIM_MODEL:=griffon}
+PX4_SIM_MODEL=${PX4_SIM_MODEL:=griffin}
 
 param set-default SIM_GZ_EN 1
 
@@ -54,6 +54,6 @@ param set-default SIM_GZ_EC_DIS4 575
 
 # Hover throttle is TUNED, not measured - it follows from what the motors,
 # props and ESCs actually produce. Here it matches the simulated max_thrust of
-# 4.5 N per rotor in GriffonThrustSystem. The real vehicle will have its own
-# value, so this deliberately does NOT go in rc.griffon_defaults.
+# 4.5 N per rotor in GriffinThrustSystem. The real vehicle will have its own
+# value, so this deliberately does NOT go in rc.griffin_defaults.
 param set-default MPC_THR_HOVER 0.60

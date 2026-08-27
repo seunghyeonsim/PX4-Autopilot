@@ -1,10 +1,10 @@
 #!/bin/sh
 #
-# GRIFFON — properties that the simulation and the real vehicle share.
+# GRIFFIN — properties that the simulation and the real vehicle share.
 #
 # Sourced by BOTH airframe files:
-#   init.d-posix/airframes/4007_gz_griffon   (SITL)
-#   init.d/airframes/4007_griffon            (Pixhawk)
+#   init.d-posix/airframes/4007_gz_griffin   (SITL)
+#   init.d/airframes/4007_griffin            (Pixhawk)
 #
 # What belongs here: quantities that were MEASURED off the vehicle - geometry,
 # mass, inertia, propeller coefficients. If the number comes from a ruler or a
@@ -21,15 +21,15 @@
 # SITL keeps flying while the real vehicle is wrong.
 #
 # WARNING: the numbers below are still the placeholder values carried over
-# from the old CAROLLINE airframe. Nothing here has been measured on GRIFFON.
-# See Sim_Real_Config.html in the GRIFFON repo for the checklist.
+# from the old CAROLLINE airframe. Nothing here has been measured on GRIFFIN.
+# See Sim_Real_Config.html in the GRIFFIN repo for the checklist.
 #
 # Geometry source of truth:
-#   Griffon_ws/src/griffon_description/urdf/griffon_params.xacro
+#   Griffin_ws/src/griffin_description/urdf/griffin_params.xacro
 #     arm     = 0.1125 m
 #     rotor_z = 0.005 m   (FLU, above centre)  ->  -0.005 in FRD
 #
-# Rotor numbering follows the GRIFFON airframe drawing, not the PX4 default:
+# Rotor numbering follows the GRIFFIN airframe drawing, not the PX4 default:
 #
 #   motor 1  right  (body -y in ROS/FLU, +y here in FRD)  CCW
 #   motor 2  left                                          CCW
@@ -37,7 +37,7 @@
 #   motor 4  rear                                          CW
 #
 # Positions are in the PX4 body frame (FRD: x forward, y right, z down). The
-# GRIFFON URDF is REP-103 (FLU), so y and z are negated relative to the xacro.
+# GRIFFIN URDF is REP-103 (FLU), so y and z are negated relative to the xacro.
 
 # ---------------------------------------------------------------- allocation
 param set-default CA_AIRFRAME 0
@@ -74,7 +74,7 @@ param set-default CA_R_REV 15
 
 # ------------------------------------------------------------------ estimator
 # Height reference. The PX4 default is GPS (1), which suits an outdoor vehicle.
-# GRIFFON flies indoors inside a cage, where there is no GPS fix at all, so the
+# GRIFFIN flies indoors inside a cage, where there is no GPS fix at all, so the
 # barometer is the source that will actually be there. Once the LIO chain feeds
 # EKF2, vision (3) becomes the right reference.
 #   0 = barometer, 1 = GPS, 2 = range sensor, 3 = vision
