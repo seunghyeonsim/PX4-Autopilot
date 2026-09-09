@@ -27,7 +27,7 @@
 #
 # Geometry source of truth:
 #   Griffin_ws/src/griffin_description/urdf/griffin_params.xacro
-#     arm     = 0.11 m
+#     arm     = 0.112 m   (CAD 0.11 corrected by 2 mm against the mesh)
 #     rotor_z = 0.0 m     (rotor plane through the centre of mass)
 #
 # Rotor numbering (same as PX4's 5001_quad_+):
@@ -46,24 +46,24 @@ param set-default CA_ROTOR_COUNT 4
 
 # motor 1 — right, CCW  (KM > 0 is CCW in PX4)
 param set-default CA_ROTOR0_PX 0.0
-param set-default CA_ROTOR0_PY 0.11
+param set-default CA_ROTOR0_PY 0.112
 param set-default CA_ROTOR0_PZ 0.0
 param set-default CA_ROTOR0_KM 0.05
 
 # motor 2 — left, CCW
 param set-default CA_ROTOR1_PX 0.0
-param set-default CA_ROTOR1_PY -0.11
+param set-default CA_ROTOR1_PY -0.112
 param set-default CA_ROTOR1_PZ 0.0
 param set-default CA_ROTOR1_KM 0.05
 
 # motor 3 — front, CW
-param set-default CA_ROTOR2_PX 0.11
+param set-default CA_ROTOR2_PX 0.112
 param set-default CA_ROTOR2_PY 0.0
 param set-default CA_ROTOR2_PZ 0.0
 param set-default CA_ROTOR2_KM -0.05
 
 # motor 4 — rear, CW
-param set-default CA_ROTOR3_PX -0.11
+param set-default CA_ROTOR3_PX -0.112
 param set-default CA_ROTOR3_PY 0.0
 param set-default CA_ROTOR3_PZ 0.0
 param set-default CA_ROTOR3_KM -0.05
