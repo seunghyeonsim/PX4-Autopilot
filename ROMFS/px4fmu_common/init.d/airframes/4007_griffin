@@ -1,0 +1,94 @@
+#!/bin/sh
+#
+# @name GRIFFIN caged rolling drone
+#
+# @type Quadrotor +
+# @class Copter
+#
+# @maintainer Seunghyeon Sim
+#
+# Caged rolling quadrotor on a Pixhawk FMU-v6C with a Jetson companion.
+#
+# Everything this vehicle shares with the Gazebo one (4007_gz_griffin) -
+# geometry, rotor layout, propeller coefficients, estimator source - lives in
+# rc.griffin_defaults and is sourced below. Only what is genuinely
+# hardware-specific stays here: output protocol, ESC pulse range, the
+# companion link, and tuning.
+#
+# STATUS: written before the vehicle existed, never executed on a Pixhawk.
+# SITL does NOT run this file (it is in the build, but only its @-header is
+# parsed), so nothing here is verified until the board boots with it.
+# First test: props off, QGC Actuators tab, check motor number, spin
+# direction and that reverse actually reverses.
+#
+
+. ${R}etc/init.d/rc.mc_defaults
+. ${R}etc/init.d/rc.griffin_defaults
+
+# ---------------------------------------------------------------- outputs
+# Motor numbering and directions are fixed by rc.griffin_defaults:
+#   1 right CCW, 2 left CCW, 3 front CW, 4 rear CW.
+# MAIN 1-4 all sit on TIM1, which is PWM_MAIN_TIM0 on this board.
+param set-default PWM_MAIN_FUNC1 101
+param set-default PWM_MAIN_FUNC2 102
+param set-default PWM_MAIN_FUNC3 103
+param set-default PWM_MAIN_FUNC4 104
+
+# ------------------------------------------------- ESC block (PLACEHOLDER)
+# The GRIFFIN ESCs are not chosen yet. The values below are CAROLLINE's
+# propulsion module (AK32 35 A, BLHeli_32 "Bidirectional Soft", rampup 100 %:
+# 1040 full reverse, 1500 neutral, 1960 full forward - GRIFFIN_TEXTBOOK,
+# CAROLLINE.tex "Propulsion Module"). They are here so the file boots with a
+# SAFE neutral, not because they are right. Replace this whole block once the
+# ESC is known - and only this block; nothing outside it depends on the ESC.
+#
+# Rules that hold for any bidirectional ESC:
+#   - PX4 puts zero thrust for a reversible motor (CA_R_REV) at the MIDPOINT of
+#     [MIN, MAX], so MIN and MAX must be symmetric about the ESC's neutral pulse.
+#   - DISARMED and FAILSAFE must be that neutral pulse. The PX4 default (1000)
+#     is not "off" on a reversible ESC - it is full reverse. Same trap as
+#     SIM_GZ_EC_DIS in the simulation file.
+#
+# Protocol: 400 = PWM at 400 Hz. For a DShot ESC in 3D mode use -3 (DShot600)
+# with DSHOT_3D_ENABLE 1 and DSHOT_MIN 0, and delete the MIN/MAX/DIS/FAIL
+# lines - DShot 3D splits the range itself.
+param set-default PWM_MAIN_TIM0 400
+
+param set-default PWM_MAIN_MIN1 1040
+param set-default PWM_MAIN_MIN2 1040
+param set-default PWM_MAIN_MIN3 1040
+param set-default PWM_MAIN_MIN4 1040
+
+param set-default PWM_MAIN_MAX1 1960
+param set-default PWM_MAIN_MAX2 1960
+param set-default PWM_MAIN_MAX3 1960
+param set-default PWM_MAIN_MAX4 1960
+
+param set-default PWM_MAIN_DIS1 1500
+param set-default PWM_MAIN_DIS2 1500
+param set-default PWM_MAIN_DIS3 1500
+param set-default PWM_MAIN_DIS4 1500
+
+param set-default PWM_MAIN_FAIL1 1500
+param set-default PWM_MAIN_FAIL2 1500
+param set-default PWM_MAIN_FAIL3 1500
+param set-default PWM_MAIN_FAIL4 1500
+# ------------------------------------------------- end of ESC block
+
+# ---------------------------------------------------------------- companion
+# Jetson on TELEM2 (/dev/ttyS3 on this board) over uXRCE-DDS. Agent side:
+#   MicroXRCEAgent serial --dev /dev/ttyTHS1 -b 921600
+#
+# The DDS domain must equal ROS_DOMAIN_ID (42 on both machines). SITL gets
+# this for free - rcS copies the environment variable into the parameter -
+# but a Pixhawk has no environment, so it is set here. With the default 0 the
+# /fmu/* topics never appear in ROS 2 and nothing reports an error.
+param set-default UXRCE_DDS_CFG 102
+param set-default SER_TEL2_BAUD 921600
+param set-default UXRCE_DDS_DOM_ID 42
+
+# ---------------------------------------------------------------- tuning
+# Hover throttle is TUNED, not measured. The simulation's 0.60 belongs to the
+# 4.5 N simulated rotor; the real value comes from the thrust stand and the
+# first tethered hover. Left at the PX4 default until then, on purpose.
+# param set-default MPC_THR_HOVER 0.5
