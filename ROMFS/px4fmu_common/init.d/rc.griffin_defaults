@@ -67,10 +67,12 @@ param set-default CA_ROTOR3_PY 0.0
 param set-default CA_ROTOR3_PZ -0.005
 param set-default CA_ROTOR3_KM -0.05
 
-# All four motors are bidirectional (bits 0-3). Rolling drives the cage with
-# reverse thrust, which a stock unidirectional mixer cannot produce. This is a
-# property of the ESCs, so it is the same claim in both builds.
-param set-default CA_R_REV 15
+# CA_R_REV (which motors may reverse) is deliberately NOT here. It describes
+# the ESCs, not the vehicle geometry, and the two builds currently disagree:
+# the simulation reverses all four motors (rolling needs reverse thrust), the
+# first hardware build flies on stock unidirectional ESCs. Each airframe file
+# sets its own value. Sharing it would put a reversible mapping on a
+# unidirectional ESC, where "zero thrust" lands at half throttle.
 
 # ------------------------------------------------------------------ estimator
 # GNSS aiding off. GRIFFIN flies indoors inside a cage, where there is no fix to

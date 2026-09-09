@@ -18,8 +18,8 @@
 # STATUS: written before the vehicle existed, never executed on a Pixhawk.
 # SITL does NOT run this file (it is in the build, but only its @-header is
 # parsed), so nothing here is verified until the board boots with it.
-# First test: props off, QGC Actuators tab, check motor number, spin
-# direction and that reverse actually reverses.
+# First test: props off, QGC Actuators tab, check motor number and spin
+# direction.
 #
 
 . ${R}etc/init.d/rc.mc_defaults
@@ -34,45 +34,40 @@ param set-default PWM_MAIN_FUNC2 102
 param set-default PWM_MAIN_FUNC3 103
 param set-default PWM_MAIN_FUNC4 104
 
-# ------------------------------------------------- ESC block (PLACEHOLDER)
-# The GRIFFIN ESCs are not chosen yet. The values below are CAROLLINE's
-# propulsion module (AK32 35 A, BLHeli_32 "Bidirectional Soft", rampup 100 %:
-# 1040 full reverse, 1500 neutral, 1960 full forward - GRIFFIN_TEXTBOOK,
-# CAROLLINE.tex "Propulsion Module"). They are here so the file boots with a
-# SAFE neutral, not because they are right. Replace this whole block once the
-# ESC is known - and only this block; nothing outside it depends on the ESC.
+# ------------------------------------------------- ESC block (phase 1)
+# Phase 1 flies on stock UNIDIRECTIONAL ESCs: hover and flight only, no
+# rolling. Everything in this block is about the ESC and changes together
+# when the ESCs do; nothing outside it depends on them.
 #
-# Rules that hold for any bidirectional ESC:
-#   - PX4 puts zero thrust for a reversible motor (CA_R_REV) at the MIDPOINT of
-#     [MIN, MAX], so MIN and MAX must be symmetric about the ESC's neutral pulse.
-#   - DISARMED and FAILSAFE must be that neutral pulse. The PX4 default (1000)
-#     is not "off" on a reversible ESC - it is full reverse. Same trap as
-#     SIM_GZ_EC_DIS in the simulation file.
+# No motor may reverse. This overrides nothing in rc.griffin_defaults - that
+# file deliberately leaves CA_R_REV to the airframe. With a reversible
+# mapping (CA_R_REV 15) on a unidirectional ESC, "zero thrust" would sit at
+# the midpoint of the pulse range, i.e. half throttle the moment it arms.
+param set-default CA_R_REV 0
+
+# Protocol: 400 = PWM at 400 Hz on TIM1 (MAIN 1-4). Pulse range, disarmed and
+# failsafe stay at the PX4 defaults for a standard ESC: 1000 min / 2000 max /
+# 1000 disarmed. Run the QGC ESC calibration once so the ESC learns them.
 #
-# Protocol: 400 = PWM at 400 Hz. For a DShot ESC in 3D mode use -3 (DShot600)
-# with DSHOT_3D_ENABLE 1 and DSHOT_MIN 0, and delete the MIN/MAX/DIS/FAIL
-# lines - DShot 3D splits the range itself.
+# If the ESC speaks DShot, prefer it - no calibration, no pulse range:
+#   param set-default PWM_MAIN_TIM0 -3     # DShot600
+#   param set-default DSHOT_MIN 0.05       # keep motors turning while armed
 param set-default PWM_MAIN_TIM0 400
 
-param set-default PWM_MAIN_MIN1 1040
-param set-default PWM_MAIN_MIN2 1040
-param set-default PWM_MAIN_MIN3 1040
-param set-default PWM_MAIN_MIN4 1040
-
-param set-default PWM_MAIN_MAX1 1960
-param set-default PWM_MAIN_MAX2 1960
-param set-default PWM_MAIN_MAX3 1960
-param set-default PWM_MAIN_MAX4 1960
-
-param set-default PWM_MAIN_DIS1 1500
-param set-default PWM_MAIN_DIS2 1500
-param set-default PWM_MAIN_DIS3 1500
-param set-default PWM_MAIN_DIS4 1500
-
-param set-default PWM_MAIN_FAIL1 1500
-param set-default PWM_MAIN_FAIL2 1500
-param set-default PWM_MAIN_FAIL3 1500
-param set-default PWM_MAIN_FAIL4 1500
+# ---- phase 2, bidirectional ESCs (rolling). Not active. Replace the lines
+# above with these once the ESCs are chosen and CONFIRMED to reverse.
+# PX4 puts zero thrust for a reversible motor at the MIDPOINT of [MIN, MAX],
+# so MIN/MAX must be symmetric about the ESC's neutral pulse, and DISARMED
+# and FAILSAFE must be that neutral - the default 1000 would be full reverse.
+# CAROLLINE's BLHeli_32 "Bidirectional Soft" ESCs were 1040 / 1500 / 1960.
+#   param set-default CA_R_REV 15
+#   param set-default PWM_MAIN_TIM0 400
+#   param set-default PWM_MAIN_MIN1 1040   (x4)
+#   param set-default PWM_MAIN_MAX1 1960   (x4)
+#   param set-default PWM_MAIN_DIS1 1500   (x4)
+#   param set-default PWM_MAIN_FAIL1 1500  (x4)
+# DShot 3D instead: PWM_MAIN_TIM0 -3, DSHOT_3D_ENABLE 1, DSHOT_MIN 0, and no
+# MIN/MAX/DIS/FAIL lines - DShot 3D splits the range itself.
 # ------------------------------------------------- end of ESC block
 
 # ---------------------------------------------------------------- companion

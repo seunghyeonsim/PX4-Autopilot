@@ -16,6 +16,12 @@
 . ${R}etc/init.d/rc.mc_defaults
 . ${R}etc/init.d/rc.griffin_defaults
 
+# All four simulated motors are bidirectional (bits 0-3). Rolling drives the
+# cage with reverse thrust, and GriffinThrustSystem maps the lower half of the
+# output range to negative thrust. This is an ESC property, so it lives here
+# and not in rc.griffin_defaults - the hardware file sets its own value.
+param set-default CA_R_REV 15
+
 PX4_SIMULATOR=${PX4_SIMULATOR:=gz}
 PX4_GZ_WORLD=${PX4_GZ_WORLD:=default}
 PX4_SIM_MODEL=${PX4_SIM_MODEL:=griffin}
