@@ -20,16 +20,17 @@
 # a later correction can land in only one of them, and nothing errors out -
 # SITL keeps flying while the real vehicle is wrong.
 #
-# WARNING: the numbers below are still the placeholder values carried over
-# from the old CAROLLINE airframe. Nothing here has been measured on GRIFFIN.
-# See Sim_Real_Config.html in the GRIFFIN repo for the checklist.
+# 2026-09-09: geometry taken from the GRIFFIN SolidWorks model. The frame has
+# already flown without its cage on the stock "Generic Quad + geometry"
+# airframe (5001), whose rotor order and directions are exactly the ones
+# below, so this layout is the flown one - only the arm length is specific.
 #
 # Geometry source of truth:
 #   Griffin_ws/src/griffin_description/urdf/griffin_params.xacro
-#     arm     = 0.1125 m
-#     rotor_z = 0.005 m   (FLU, above centre)  ->  -0.005 in FRD
+#     arm     = 0.11 m
+#     rotor_z = 0.0 m     (rotor plane through the centre of mass)
 #
-# Rotor numbering follows the GRIFFIN airframe drawing, not the PX4 default:
+# Rotor numbering (same as PX4's 5001_quad_+):
 #
 #   motor 1  right  (body -y in ROS/FLU, +y here in FRD)  CCW
 #   motor 2  left                                          CCW
@@ -45,26 +46,26 @@ param set-default CA_ROTOR_COUNT 4
 
 # motor 1 — right, CCW  (KM > 0 is CCW in PX4)
 param set-default CA_ROTOR0_PX 0.0
-param set-default CA_ROTOR0_PY 0.1125
-param set-default CA_ROTOR0_PZ -0.005
+param set-default CA_ROTOR0_PY 0.11
+param set-default CA_ROTOR0_PZ 0.0
 param set-default CA_ROTOR0_KM 0.05
 
 # motor 2 — left, CCW
 param set-default CA_ROTOR1_PX 0.0
-param set-default CA_ROTOR1_PY -0.1125
-param set-default CA_ROTOR1_PZ -0.005
+param set-default CA_ROTOR1_PY -0.11
+param set-default CA_ROTOR1_PZ 0.0
 param set-default CA_ROTOR1_KM 0.05
 
 # motor 3 — front, CW
-param set-default CA_ROTOR2_PX 0.1125
+param set-default CA_ROTOR2_PX 0.11
 param set-default CA_ROTOR2_PY 0.0
-param set-default CA_ROTOR2_PZ -0.005
+param set-default CA_ROTOR2_PZ 0.0
 param set-default CA_ROTOR2_KM -0.05
 
 # motor 4 — rear, CW
-param set-default CA_ROTOR3_PX -0.1125
+param set-default CA_ROTOR3_PX -0.11
 param set-default CA_ROTOR3_PY 0.0
-param set-default CA_ROTOR3_PZ -0.005
+param set-default CA_ROTOR3_PZ 0.0
 param set-default CA_ROTOR3_KM -0.05
 
 # CA_R_REV (which motors may reverse) is deliberately NOT here. It describes

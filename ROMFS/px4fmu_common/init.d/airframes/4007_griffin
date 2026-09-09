@@ -45,14 +45,19 @@ param set-default PWM_MAIN_FUNC4 104
 # the midpoint of the pulse range, i.e. half throttle the moment it arms.
 param set-default CA_R_REV 0
 
-# Protocol: 400 = PWM at 400 Hz on TIM1 (MAIN 1-4). Pulse range, disarmed and
-# failsafe stay at the PX4 defaults for a standard ESC: 1000 min / 2000 max /
-# 1000 disarmed. Run the QGC ESC calibration once so the ESC learns them.
+# ESC: AIKON AK32 4-in-1 55 A, BLHeli_32 V3 - speaks DShot, so DShot600 on
+# TIM1 (MAIN 1-4): no ESC calibration, no pulse range to get wrong. DSHOT_MIN
+# keeps the props turning while armed so a motor never has to restart in
+# flight. Motors: T-Motor F90 1500KV, 6040 props, 6S.
 #
-# If the ESC speaks DShot, prefer it - no calibration, no pulse range:
-#   param set-default PWM_MAIN_TIM0 -3     # DShot600
-#   param set-default DSHOT_MIN 0.05       # keep motors turning while armed
-param set-default PWM_MAIN_TIM0 400
+# TO RECONCILE: the frame already flew (without cage) on this Pixhawk. Before
+# flashing, dump its parameters and copy what it actually used here -
+# PWM_MAIN_TIM0, DSHOT_MIN, and the MC_*RATE_* gains.
+#
+# PWM fallback: PWM_MAIN_TIM0 400 with the PX4 default 1000/2000/1000 range,
+# plus one QGC ESC calibration.
+param set-default PWM_MAIN_TIM0 -3
+param set-default DSHOT_MIN 0.05
 
 # ---- phase 2, bidirectional ESCs (rolling). Not active. Replace the lines
 # above with these once the ESCs are chosen and CONFIRMED to reverse.

@@ -59,7 +59,8 @@ param set-default SIM_GZ_EC_DIS3 575
 param set-default SIM_GZ_EC_DIS4 575
 
 # Hover throttle is TUNED, not measured - it follows from what the motors,
-# props and ESCs actually produce. Here it matches the simulated max_thrust of
-# 4.5 N per rotor in GriffinThrustSystem. The real vehicle will have its own
-# value, so this deliberately does NOT go in rc.griffin_defaults.
-param set-default MPC_THR_HOVER 0.60
+# props and ESCs actually produce. Here it follows the simulated rotor:
+# 2.2565 kg * 9.81 / 4 = 5.53 N per rotor against max_thrust 17.7 N in
+# gz_actuation.xacro -> 0.31. The real vehicle will have its own value, so
+# this deliberately does NOT go in rc.griffin_defaults.
+param set-default MPC_THR_HOVER 0.31
