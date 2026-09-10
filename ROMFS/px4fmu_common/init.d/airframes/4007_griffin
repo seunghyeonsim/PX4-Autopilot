@@ -87,17 +87,17 @@ param set-default PWM_MAIN_DIS4 1000
 # ------------------------------------------------- end of ESC block
 
 # ------------------------------------------------- flown setup, carried over
-# Selecting a new airframe makes PX4 reset every parameter except RC*,
-# COM_FLTMODE*, accel/gyro calibration and a few counters. What the flown
-# configuration relied on beyond those is restated here:
+# Selecting a new airframe resets parameters, but v1.15 keeps more than the
+# docs suggest: RC*, COM_FLTMODE*, all CAL_* (mag included), CBRK_* survived
+# the switch on 2026-09-10 (GRIFFIN/docs/pixhawk/params_2026-09-10_after_4007.txt).
+# What the flown configuration relied on beyond those is restated here:
 param set-default BAT1_N_CELLS 6
 param set-default COM_ARM_WO_GPS 1        # there is no GPS on this vehicle
 param set-default COM_RC_IN_MODE 3
 # The flown setup also had the safety-switch and USB-connected arming checks
 # disabled (CBRK_IO_SAFETY, CBRK_USB_CHK) and the supply check off
-# (CBRK_SUPPLY_CHK). Those are deliberately NOT set here - set them by hand in
-# QGC if the bench test needs them. Magnetometer calibration (CAL_MAG*) is not
-# preserved either; redo it in QGC.
+# (CBRK_SUPPLY_CHK). Those are deliberately NOT set here; they survived the
+# airframe switch on this board, and on a fresh board they are a QGC decision.
 
 # ---------------------------------------------------------------- companion
 # Jetson on TELEM2 (/dev/ttyS3 on this board) over uXRCE-DDS. Agent side:
