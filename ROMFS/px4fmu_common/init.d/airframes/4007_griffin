@@ -15,11 +15,11 @@
 # hardware-specific stays here: output protocol, ESC pulse range, the
 # companion link, and tuning.
 #
-# STATUS: written before the vehicle existed, never executed on a Pixhawk.
-# SITL does NOT run this file (it is in the build, but only its @-header is
-# parsed), so nothing here is verified until the board boots with it.
-# First test: props off, QGC Actuators tab, check motor number and spin
-# direction.
+# STATUS 2026-09-10: booted on the FMU-v6C. After selecting 4007 every
+# set-default line here and in rc.griffin_defaults read back from the board
+# (44/44). Not yet done: props-off motor test, first hover.
+# SITL does NOT run this file (only its @-header is parsed), so a SITL build
+# proves nothing about it - only the board does.
 #
 
 . ${R}etc/init.d/rc.mc_defaults
