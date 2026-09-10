@@ -45,19 +45,30 @@ param set-default PWM_MAIN_FUNC4 104
 # the midpoint of the pulse range, i.e. half throttle the moment it arms.
 param set-default CA_R_REV 0
 
-# ESC: AIKON AK32 4-in-1 55 A, BLHeli_32 V3 - speaks DShot, so DShot600 on
-# TIM1 (MAIN 1-4): no ESC calibration, no pulse range to get wrong. DSHOT_MIN
-# keeps the props turning while armed so a motor never has to restart in
-# flight. Motors: T-Motor F90 1500KV, 6040 props, 6S.
+# ESC: AIKON AK32 4-in-1 55 A, BLHeli_32 V3. Motors T-Motor F90 1500KV, 6040
+# props, 6S.
 #
-# TO RECONCILE: the frame already flew (without cage) on this Pixhawk. Before
-# flashing, dump its parameters and copy what it actually used here -
-# PWM_MAIN_TIM0, DSHOT_MIN, and the MC_*RATE_* gains.
+# These are the values the frame actually FLEW with (without its cage) on the
+# stock 5001 airframe, dumped from the Pixhawk on 2026-09-10 before flashing
+# this fork (GRIFFIN/docs/pixhawk/params_2026-09-10_before_griffin.txt):
+# plain PWM at 400 Hz, 1100..1900 us, 1000 us disarmed. Kept as flown. The
+# rate/attitude gains in that dump were PX4 defaults, so nothing to carry.
 #
-# PWM fallback: PWM_MAIN_TIM0 400 with the PX4 default 1000/2000/1000 range,
-# plus one QGC ESC calibration.
-param set-default PWM_MAIN_TIM0 -3
-param set-default DSHOT_MIN 0.05
+# The ESC speaks DShot too. To switch later: PWM_MAIN_TIM0 -3 (DShot600),
+# DSHOT_MIN 0.05, and drop the MIN/MAX/DIS lines. Re-test props off first.
+param set-default PWM_MAIN_TIM0 400
+param set-default PWM_MAIN_MIN1 1100
+param set-default PWM_MAIN_MIN2 1100
+param set-default PWM_MAIN_MIN3 1100
+param set-default PWM_MAIN_MIN4 1100
+param set-default PWM_MAIN_MAX1 1900
+param set-default PWM_MAIN_MAX2 1900
+param set-default PWM_MAIN_MAX3 1900
+param set-default PWM_MAIN_MAX4 1900
+param set-default PWM_MAIN_DIS1 1000
+param set-default PWM_MAIN_DIS2 1000
+param set-default PWM_MAIN_DIS3 1000
+param set-default PWM_MAIN_DIS4 1000
 
 # ---- phase 2, bidirectional ESCs (rolling). Not active. Replace the lines
 # above with these once the ESCs are chosen and CONFIRMED to reverse.
@@ -74,6 +85,19 @@ param set-default DSHOT_MIN 0.05
 # DShot 3D instead: PWM_MAIN_TIM0 -3, DSHOT_3D_ENABLE 1, DSHOT_MIN 0, and no
 # MIN/MAX/DIS/FAIL lines - DShot 3D splits the range itself.
 # ------------------------------------------------- end of ESC block
+
+# ------------------------------------------------- flown setup, carried over
+# Selecting a new airframe makes PX4 reset every parameter except RC*,
+# COM_FLTMODE*, accel/gyro calibration and a few counters. What the flown
+# configuration relied on beyond those is restated here:
+param set-default BAT1_N_CELLS 6
+param set-default COM_ARM_WO_GPS 1        # there is no GPS on this vehicle
+param set-default COM_RC_IN_MODE 3
+# The flown setup also had the safety-switch and USB-connected arming checks
+# disabled (CBRK_IO_SAFETY, CBRK_USB_CHK) and the supply check off
+# (CBRK_SUPPLY_CHK). Those are deliberately NOT set here - set them by hand in
+# QGC if the bench test needs them. Magnetometer calibration (CAL_MAG*) is not
+# preserved either; redo it in QGC.
 
 # ---------------------------------------------------------------- companion
 # Jetson on TELEM2 (/dev/ttyS3 on this board) over uXRCE-DDS. Agent side:
