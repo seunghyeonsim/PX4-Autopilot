@@ -111,6 +111,16 @@ param set-default UXRCE_DDS_CFG 102
 param set-default SER_TEL2_BAUD 921600
 param set-default UXRCE_DDS_DOM_ID 42
 
+# ---------------------------------------------------------------- estimator
+# No magnetometer fusion. Heading comes from the LIO (EV yaw). With both fused
+# the mag heading (true north) and the LIO heading (zero at LIO start) fight,
+# EV positions come in rotated, and EKF2 rejects everything: pre-flight
+# heading/height innovation failures, position test ratio in the hundreds.
+# Seen on 2026-09-10; setting 5 cleared it and the vehicle armed. Indoors in a
+# cage the magnetometer is unreliable anyway. (Simulation keeps its perfect
+# simulated mag, which is why this never showed up there.)
+param set-default EKF2_MAG_TYPE 5
+
 # ---------------------------------------------------------------- tuning
 # Hover throttle is TUNED, not measured. The simulation's 0.60 belongs to the
 # 4.5 N simulated rotor; the real value comes from the thrust stand and the
