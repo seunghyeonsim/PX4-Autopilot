@@ -127,6 +127,12 @@ param set-default EKF2_MAG_TYPE 5
 # 15 ms p90; the bridge and the 921600 serial add a few ms. 10 ms.
 param set-default EKF2_EV_DELAY 10
 
+# No magnetometer required. The GPS module (which carried the calibrated
+# external compass and the buzzer) is removed for indoor LIO flight; without
+# this the arming checks flag "magnetometer" because CAL_MAG0 is gone.
+# The 6C's internal IST8310 is still there but unused (EKF2_MAG_TYPE 5).
+param set-default SYS_HAS_MAG 0
+
 # ---------------------------------------------------------------- tuning
 # Hover throttle is TUNED, not measured. The simulation's 0.60 belongs to the
 # 4.5 N simulated rotor; the real value comes from the thrust stand and the
