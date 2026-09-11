@@ -121,6 +121,12 @@ param set-default UXRCE_DDS_DOM_ID 42
 # simulated mag, which is why this never showed up there.)
 param set-default EKF2_MAG_TYPE 5
 
+# EV delay. lio_to_px4 stamps the sample with its own receive time, so this
+# has to cover lidar-scan -> LIO -> bridge. Measured on the Jetson 2026-09-11:
+# the LIO odometry (IMU-rate propagation) trails wall clock by 1.7 ms median,
+# 15 ms p90; the bridge and the 921600 serial add a few ms. 10 ms.
+param set-default EKF2_EV_DELAY 10
+
 # ---------------------------------------------------------------- tuning
 # Hover throttle is TUNED, not measured. The simulation's 0.60 belongs to the
 # 4.5 N simulated rotor; the real value comes from the thrust stand and the
